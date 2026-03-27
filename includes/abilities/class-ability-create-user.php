@@ -19,7 +19,7 @@
  * Compare with list-users (readonly: true) — the AI can call that freely
  * without asking, because reading data is safe.
  *
- * @package MCP_Example
+ * @package CustomMCP
  */
 
 declare( strict_types=1 );
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Execute callback for the mcp-example/create-user ability.
+ * Execute callback for the custom-mcp/create-user ability.
  *
  * @param array $input {
  *     Input parameters from the AI agent.

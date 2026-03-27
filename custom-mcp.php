@@ -14,15 +14,17 @@
  * @package CustomMCP
  */
 
+declare( strict_types=1 );
+
 // If this file is called directly, abort.
-if ( ! defined( 'ABSPATH' ) ) { 
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**
  * Plugin version — used when registering the custom MCP server.
  */
-define( 'CUSTOM_MCP_VERSION', '1.0.0' );
+define( 'CUSTOM_MCP_VERSION', '2.0.0' );
 
 /**
  * Plugin directory path — used to require files.
@@ -44,7 +46,7 @@ function custom_mcp_init(): void {
 	 * infrastructure that converts our abilities into MCP tools.
 	 */
 	if ( ! function_exists( 'wp_register_ability' ) ) {
-		add_action( 'admin_notices', 'mcp_example_missing_abilities_notice' );
+		add_action( 'admin_notices', 'custom_mcp_missing_abilities_notice' );
 		return;
 	}
 

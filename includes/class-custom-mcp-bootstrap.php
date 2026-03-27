@@ -1,11 +1,11 @@
 <?php
 /**
- * Bootstrap class for MCP Example.
+ * Bootstrap class for Custom MCP.
  *
  * This is the orchestrator — it wires everything together by hooking into
  * the THREE WordPress actions that make MCP work.
  *
- * @package MCP_Example
+ * @package CustomMCP
  */
 
 declare( strict_types=1 );
@@ -22,14 +22,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Custom_MCP_Bootstrap {
 
-    /**
+	/**
 	 * Singleton instance.
 	 *
 	 * @var self|null
 	 */
 	private static ?self $instance = null;
 
-    /**
+	/**
 	 * Get the singleton instance.
 	 *
 	 * @return self
@@ -43,7 +43,7 @@ final class Custom_MCP_Bootstrap {
 		return self::$instance;
 	}
 
-    /**
+	/**
 	 * Ability names registered by this plugin.
 	 * We track these so we can pass them to our custom MCP server.
 	 *
@@ -51,7 +51,7 @@ final class Custom_MCP_Bootstrap {
 	 */
 	private array $ability_names = array();
 
-    /**
+	/**
 	 * Hook into the THREE key WordPress actions for MCP.
 	 *
 	 * These are the only three hooks you need to know:
@@ -61,12 +61,20 @@ final class Custom_MCP_Bootstrap {
 	 * 3. mcp_adapter_init                 — (Optional) Register a custom MCP server
 	 */
 	private function init(): void {
-        add_action( 'wp_abilities_api_categories_init', array( $this, 'register_category' ) );
-        add_action( 'wp_abilities_api_init', array( $this, 'register_abilities' ) );
-        add_action( 'mcp_adapter_init', array( $this, 'register_mcp_server' ) );
+		add_action( 'wp_abilities_api_categories_init', array( $this, 'register_category' ) );
+		/*
+		 * Priority 20 matches mcp-example: run after core (10) and MCP Adapter default abilities (10)
+		 * so $this->ability_names is filled in a predictable order.
+		 */
+		add_action( 'wp_abilities_api_init', array( $this, 'register_abilities' ), 20 );
+		/*
+		 * Priority 20 runs after DefaultServerFactory::create (10), which calls wp_get_abilities()
+		 * and triggers the abilities API so $this->ability_names is populated.
+		 */
+		add_action( 'mcp_adapter_init', array( $this, 'register_mcp_server' ), 20 );
 	}
 
-    /*
+	/*
 	 * ========================================================================
 	 * STEP 1: Register the ability category
 	 * ========================================================================
@@ -88,7 +96,7 @@ final class Custom_MCP_Bootstrap {
 		);
 	}
 
-    /*
+	/*
 	 * ========================================================================
 	 * STEP 2: Register abilities (each one becomes an MCP "tool")
 	 * ========================================================================
@@ -128,7 +136,7 @@ final class Custom_MCP_Bootstrap {
 		$this->register_ability_create_user();
 	}
 
-    /**
+	/**
 	 * Tool 3: Create User — a DESTRUCTIVE tool.
 	 *
 	 * This is the key teaching moment: when destructive is true, well-behaved
@@ -224,18 +232,17 @@ final class Custom_MCP_Bootstrap {
 		$this->ability_names[] = $name;
 	}
 
-
-    /**
+	/**
 	 * Register our custom MCP server with the MCP Adapter.
 	 *
 	 * @param \WP\MCP\Core\McpAdapter $adapter The MCP Adapter instance.
 	 */
 	public function register_mcp_server( $adapter ): void {
-		require_once CUSTOM_MCP_DIR . 'includes/class-mcp-example-server.php';
-        Custom_MCP_Example_Server::register( $adapter, $this->ability_names );
+		require_once CUSTOM_MCP_DIR . 'includes/class-custom-mcp-server.php';
+		Custom_MCP_Server::register( $adapter, $this->ability_names );
 	}
 
-    /**
+	/**
 	 * Get the list of registered ability names.
 	 *
 	 * @return string[]
@@ -243,5 +250,4 @@ final class Custom_MCP_Bootstrap {
 	public function get_ability_names(): array {
 		return $this->ability_names;
 	}
-	
 }
