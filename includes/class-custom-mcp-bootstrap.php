@@ -231,7 +231,17 @@ final class Custom_MCP_Bootstrap {
 	 * @param \WP\MCP\Core\McpAdapter $adapter The MCP Adapter instance.
 	 */
 	public function register_mcp_server( $adapter ): void {
-		
+		require_once CUSTOM_MCP_DIR . 'includes/class-mcp-example-server.php';
+        Custom_MCP_Example_Server::register( $adapter, $this->ability_names );
+	}
+
+    /**
+	 * Get the list of registered ability names.
+	 *
+	 * @return string[]
+	 */
+	public function get_ability_names(): array {
+		return $this->ability_names;
 	}
 	
 }
